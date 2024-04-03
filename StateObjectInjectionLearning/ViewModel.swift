@@ -1,11 +1,17 @@
 import Foundation
+import Dependencies
 
-class ViewModel: ObservableObject {
+protocol ViewModel: ObservableObject {
+  var message: String { get }
+  func load()
+}
+
+class DefaultViewModel: ViewModel {
   @Published var message = ""
 
   func load() {
     Task {
-      let client = ApiClient()
+      @Dependency(\.apiClient) var client
       let message = try await client.getMessage()
       await MainActor.run {
         self.message = message
